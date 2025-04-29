@@ -29,6 +29,9 @@ export interface Database {
           status: string
           created_at: string | null
           updated_at: string | null
+          company_complaint_number: string | null
+          machine_number: string | null
+          machine_capacity: string | null
         }
         Insert: {
           id?: string
@@ -49,6 +52,9 @@ export interface Database {
           status?: string
           created_at?: string | null
           updated_at?: string | null
+          company_complaint_number?: string | null
+          machine_number?: string | null
+          machine_capacity?: string | null
         }
         Update: {
           id?: string
@@ -69,6 +75,9 @@ export interface Database {
           status?: string
           created_at?: string | null
           updated_at?: string | null
+          company_complaint_number?: string | null
+          machine_number?: string | null
+          machine_capacity?: string | null
         }
       }
     }

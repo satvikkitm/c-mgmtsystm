@@ -1,22 +1,27 @@
 export interface Complaint {
   id: string;
   complaint_number: string;
-  date: string;
   customer_name: string;
-  address: string;
-  place: string;
-  contact_number: string;
+  contact_number?: string;
+  address?: string;
   machine_type: string;
-  company: string;
+  machine_number: string;
   fault: string;
-  work_done: string;
-  parts_used: string;
-  cost: number;
-  technician_name: string;
-  completion_date: string | null;
+  date: string;
   status: 'Open' | 'Closed';
-  created_at: string;
-  updated_at: string;
+  technician_name?: string;
+  resolution?: string;
 }
 
-export interface ComplaintFormData extends Omit<Complaint, 'id' | 'created_at' | 'updated_at' | 'complaint_number'> {}
+export interface ComplaintFormData {
+  customer_name: string;
+  contact_number?: string;
+  address?: string;
+  machine_type: string;
+  machine_number: string;
+  fault: string;
+  date: string;
+  status: 'Open' | 'Closed';
+  technician_name?: string;
+  resolution?: string;
+}
