@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
-import { Plus, Loader } from 'lucide-react';
+import { Plus, Loader, ArrowLeft } from 'lucide-react';
 import { ComplaintForm } from './components/ComplaintForm';
 import { ComplaintList } from './components/ComplaintList';
 import { ComplaintDetails } from './components/ComplaintDetails';
@@ -54,10 +54,13 @@ function App() {
 
   // memoized navigation functions to ensure they don't change on every render
   const navigateToDashboard = useCallback(() => {
-    console.log("Navigating to dashboard");
-    setCurrentView('dashboard');
+    console.log("Navigating to dashboard - resetting all states");
+    // Explicitly reset all state values
     setShowForm(false);
     setEditingComplaint(null);
+    setSelectedComplaint(null);
+    // Set the current view last
+    setCurrentView('dashboard');
   }, []);
 
   const navigateToNew = useCallback(() => {
@@ -85,13 +88,21 @@ function App() {
     console.log('Navigating to view:', view);
     
     if (view === 'dashboard') {
+      console.log('Calling navigateToDashboard');
       navigateToDashboard();
     } else if (view === 'new') {
+      console.log('Calling navigateToNew');
       navigateToNew();
+    } else if (view === 'edit' && editingComplaint) {
+      console.log('Calling navigateToEdit');
+      navigateToEdit(editingComplaint);
     } else if (view === 'search') {
+      console.log('Calling navigateToSearch');
       navigateToSearch();
+    } else {
+      console.log('Unknown view:', view);
     }
-  }, [navigateToDashboard, navigateToNew, navigateToSearch]);
+  }, [navigateToDashboard, navigateToNew, navigateToEdit, navigateToSearch, editingComplaint]);
 
   const handleSubmit = useCallback(async (formData: ComplaintFormData) => {
     try {
@@ -189,7 +200,7 @@ function App() {
               transition={{ duration: 0.15 }}
               className="hw-accelerated"
             >
-              <div className="mb-6 flex items-center">
+              <div className="mb-6 flex items-center justify-between">
                 <motion.h1 
                   className="text-2xl font-bold text-[#EAEAEA]"
                   initial={{ opacity: 0, x: -10 }}
@@ -198,6 +209,16 @@ function App() {
                 >
                   {currentView === 'edit' ? 'Edit Complaint' : 'New Complaint'}
                 </motion.h1>
+                
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="flex items-center text-gray-300 hover:text-white transition-colors"
+                  onClick={handleCancelForm}
+                >
+                  <ArrowLeft className="h-5 w-5 mr-2" />
+                  Back to Dashboard
+                </motion.button>
               </div>
               
               <ComplaintForm
