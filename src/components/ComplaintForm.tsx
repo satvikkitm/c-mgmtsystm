@@ -275,7 +275,11 @@ export function ComplaintForm({ onSubmit, initialData, onCancel, isEditMode = fa
           <div className="px-6 py-4 bg-gray-800/50 border-t border-gray-700/50 flex justify-between items-center">
             <button
               type="button"
-              onClick={onCancel}
+              onClick={(e) => {
+                e.preventDefault();
+                console.log("Cancel button clicked");
+                onCancel();
+              }}
               className="btn-outline"
             >
               Cancel
