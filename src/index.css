@@ -99,15 +99,15 @@
   }
   
   .glass-card-header {
-    @apply p-4 border-b border-[#2C2F36];
+    @apply p-3 border-b border-[#2C2F36];
   }
   
   .glass-card-body {
-    @apply p-6;
+    @apply p-4;
   }
   
   .glass-card-footer {
-    @apply p-4 bg-[#1F222A]/90 border-t border-[#2C2F36];
+    @apply p-3 bg-[#1F222A]/90 border-t border-[#2C2F36];
   }
   
   .badge {
@@ -163,5 +163,19 @@
   
   .hover-optimized:hover {
     transform: translateY(-2px);
+  }
+  
+  /* Modal and overlay styles */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-sm z-40;
+  }
+  
+  .modal-content {
+    @apply fixed inset-2 md:inset-10 glass-card z-50 overflow-auto shadow-2xl max-h-[calc(100vh-4rem)];
+  }
+  
+  /* Edit form should have highest priority */
+  .edit-form-container {
+    @apply z-60;
   }
 }

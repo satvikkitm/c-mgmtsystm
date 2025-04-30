@@ -3,6 +3,7 @@ import { AnimatePresence, motion, MotionConfig } from 'framer-motion';
 import { Plus, Loader } from 'lucide-react';
 import { ComplaintForm } from './components/ComplaintForm';
 import { ComplaintList } from './components/ComplaintList';
+import { ComplaintDetails } from './components/ComplaintDetails';
 import { SearchFilters } from './components/SearchFilters';
 import { ExportData } from './components/ExportData';
 import { Layout } from './components/Layout';
@@ -14,24 +15,29 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingComplaint, setEditingComplaint] = useState<Complaint | null>(null);
+  const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
-  const [currentView, setCurrentView] = useState<'dashboard' | 'new' | 'search'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'new' | 'edit' | 'search'>('dashboard');
 
   useEffect(() => {
     loadComplaints();
   }, []);
 
   useEffect(() => {
-    // When navigating to "new" view, show the form
-    if (currentView === 'new') {
+    // When navigating to "new" or "edit" view, show the form
+    if (currentView === 'new' || currentView === 'edit') {
       setShowForm(true);
-      setEditingComplaint(null);
+      // If not edit mode, clear any existing complaint
+      if (currentView === 'new') {
+        setEditingComplaint(null);
+      }
     }
-    // When navigating to "search", ensure we're showing the complaint list
-    else if (currentView === 'search') {
+    // When navigating to "search" or "dashboard", ensure we're showing the complaint list
+    else if (currentView === 'search' || currentView === 'dashboard') {
       setShowForm(false);
+      setEditingComplaint(null);
     }
   }, [currentView]);
 
@@ -46,6 +52,47 @@ function App() {
     }
   }, []);
 
+  // memoized navigation functions to ensure they don't change on every render
+  const navigateToDashboard = useCallback(() => {
+    console.log("Navigating to dashboard");
+    setCurrentView('dashboard');
+    setShowForm(false);
+    setEditingComplaint(null);
+  }, []);
+
+  const navigateToNew = useCallback(() => {
+    console.log("Navigating to new");
+    setCurrentView('new');
+    setShowForm(true);
+    setEditingComplaint(null);
+  }, []);
+
+  const navigateToEdit = useCallback((complaint: Complaint) => {
+    console.log("Navigating to edit mode for complaint:", complaint.id);
+    setSelectedComplaint(null);
+    setCurrentView('edit');
+    setShowForm(true);
+    setEditingComplaint(complaint);
+  }, []);
+
+  const navigateToSearch = useCallback(() => {
+    console.log("Navigating to search");
+    setCurrentView('search');
+    setShowForm(false);
+  }, []);
+
+  const handleNavigate = useCallback((view: 'dashboard' | 'new' | 'edit' | 'search') => {
+    console.log('Navigating to view:', view);
+    
+    if (view === 'dashboard') {
+      navigateToDashboard();
+    } else if (view === 'new') {
+      navigateToNew();
+    } else if (view === 'search') {
+      navigateToSearch();
+    }
+  }, [navigateToDashboard, navigateToNew, navigateToSearch]);
+
   const handleSubmit = useCallback(async (formData: ComplaintFormData) => {
     try {
       if (editingComplaint) {
@@ -54,13 +101,12 @@ function App() {
         await addComplaint(formData);
       }
       await loadComplaints();
-      setShowForm(false);
-      setCurrentView('dashboard');
-      setEditingComplaint(null);
+      console.log("Complaint saved, returning to dashboard");
+      navigateToDashboard();
     } catch (error) {
       console.error('Error saving complaint:', error);
     }
-  }, [editingComplaint, loadComplaints]);
+  }, [editingComplaint, loadComplaints, navigateToDashboard]);
 
   const handleDelete = useCallback(async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this complaint?')) return;
@@ -74,25 +120,31 @@ function App() {
   }, [loadComplaints]);
 
   const handleEdit = useCallback((complaint: Complaint) => {
-    setEditingComplaint(complaint);
-    setShowForm(true);
-    setCurrentView('new');
-  }, []);
+    console.log("Editing complaint:", complaint.id);
+    // Clear any selected complaint to close any open modals
+    setSelectedComplaint(null);
+    // Navigate to edit mode with this complaint
+    navigateToEdit(complaint);
+  }, [navigateToEdit]);
 
   const handleCancelForm = useCallback(() => {
-    setShowForm(false);
-    setEditingComplaint(null);
-    setCurrentView('dashboard');
-  }, []);
+    console.log("Canceling form, returning to dashboard");
+    navigateToDashboard();
+  }, [navigateToDashboard]);
 
   const handleNewComplaint = useCallback(() => {
-    setShowForm(true);
-    setEditingComplaint(null);
-    setCurrentView('new');
+    console.log("Creating new complaint");
+    navigateToNew();
+  }, [navigateToNew]);
+
+  const handleOpenDetails = useCallback((complaint: Complaint) => {
+    console.log("Opening details for complaint:", complaint.id);
+    setSelectedComplaint(complaint);
   }, []);
 
-  const handleNavigate = useCallback((view: 'dashboard' | 'new' | 'search') => {
-    setCurrentView(view);
+  const handleCloseDetails = useCallback(() => {
+    console.log("Closing complaint details");
+    setSelectedComplaint(null);
   }, []);
 
   const filteredComplaints = useMemo(() => {
@@ -137,10 +189,22 @@ function App() {
               transition={{ duration: 0.15 }}
               className="hw-accelerated"
             >
+              <div className="mb-6 flex items-center">
+                <motion.h1 
+                  className="text-2xl font-bold text-[#EAEAEA]"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.15 }}
+                >
+                  {currentView === 'edit' ? 'Edit Complaint' : 'New Complaint'}
+                </motion.h1>
+              </div>
+              
               <ComplaintForm
                 onSubmit={handleSubmit}
                 initialData={editingComplaint || undefined}
                 onCancel={handleCancelForm}
+                isEditMode={currentView === 'edit'}
               />
             </motion.div>
           ) : (
@@ -189,11 +253,19 @@ function App() {
                 complaints={filteredComplaints}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
+                onOpenDetails={handleOpenDetails}
               />
             </motion.div>
           )}
         </AnimatePresence>
       </Layout>
+      
+      {/* Complaint Details Modal */}
+      <ComplaintDetails 
+        complaint={selectedComplaint}
+        onClose={handleCloseDetails}
+        onEdit={handleEdit}
+      />
     </MotionConfig>
   );
 }

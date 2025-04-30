@@ -8,16 +8,19 @@ interface ComplaintFormProps {
   onSubmit: (data: ComplaintFormData) => Promise<void>;
   initialData?: Complaint;
   onCancel: () => void;
+  isEditMode?: boolean;
 }
 
-export function ComplaintForm({ onSubmit, initialData, onCancel }: ComplaintFormProps) {
+export function ComplaintForm({ onSubmit, initialData, onCancel, isEditMode = false }: ComplaintFormProps) {
   const [formData, setFormData] = useState<ComplaintFormData>({
     date: initialData?.date || format(new Date(), 'yyyy-MM-dd'),
     customer_name: initialData?.customer_name || '',
     address: initialData?.address || '',
     contact_number: initialData?.contact_number || '',
+    company_complaint_number: initialData?.company_complaint_number || 'N/A',
     machine_type: initialData?.machine_type || '',
-    machine_number: initialData?.machine_number || '',
+    machine_number: initialData?.machine_number || 'N/A',
+    machine_capacity: initialData?.machine_capacity || 'N/A',
     fault: initialData?.fault || '',
     status: initialData?.status || 'Open',
     technician_name: initialData?.technician_name || '',
@@ -53,7 +56,7 @@ export function ComplaintForm({ onSubmit, initialData, onCancel }: ComplaintForm
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
-          {initialData ? 'Update Complaint' : 'New Complaint'}
+          {isEditMode ? 'Edit Complaint' : 'New Complaint'}
         </motion.h2>
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -139,6 +142,15 @@ export function ComplaintForm({ onSubmit, initialData, onCancel }: ComplaintForm
                     onChange={handleChange}
                     placeholder="Phone number"
                   />
+
+                  <FormField
+                    label="Company Complaint Number"
+                    type="text"
+                    name="company_complaint_number"
+                    value={formData.company_complaint_number || 'N/A'}
+                    onChange={handleChange}
+                    placeholder="Company complaint reference"
+                  />
                 </div>
               </motion.div>
             )}
@@ -185,6 +197,15 @@ export function ComplaintForm({ onSubmit, initialData, onCancel }: ComplaintForm
                       <option value="Other">Other</option>
                     </select>
                   </div>
+                  
+                  <FormField
+                    label="Machine Capacity"
+                    type="text"
+                    name="machine_capacity"
+                    value={formData.machine_capacity || 'N/A'}
+                    onChange={handleChange}
+                    placeholder="Capacity specification"
+                  />
                   
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-300 mb-1">Fault Description</label>
@@ -304,7 +325,7 @@ export function ComplaintForm({ onSubmit, initialData, onCancel }: ComplaintForm
                     className="btn-primary"
                   >
                     <Save className="h-5 w-5 mr-2" />
-                    {initialData ? 'Update Complaint' : 'Save Complaint'}
+                    {isEditMode ? 'Update Complaint' : 'Save Complaint'}
                   </button>
                 </>
               )}

@@ -30,6 +30,10 @@ export const addComplaint = async (complaintData: ComplaintFormData): Promise<Co
     const newComplaint = {
       ...complaintData,
       complaint_number: generateComplaintNumber(),
+      company_complaint_number: complaintData.company_complaint_number || 'N/A',
+      machine_number: complaintData.machine_number || 'N/A',
+      machine_capacity: complaintData.machine_capacity || 'N/A',
+      resolution: complaintData.resolution || '',
     };
 
     const { data, error } = await supabase
@@ -39,7 +43,7 @@ export const addComplaint = async (complaintData: ComplaintFormData): Promise<Co
       .single();
 
     if (error) {
-      console.error('Supabase error:', error);
+      console.error('Failed to add complaint:', error);
       throw error;
     }
 
@@ -57,15 +61,23 @@ export const addComplaint = async (complaintData: ComplaintFormData): Promise<Co
 // Update complaint
 export const updateComplaint = async (id: string, complaintData: ComplaintFormData): Promise<Complaint> => {
   try {
+    const updateData = {
+      ...complaintData,
+      company_complaint_number: complaintData.company_complaint_number || 'N/A',
+      machine_number: complaintData.machine_number || 'N/A',
+      machine_capacity: complaintData.machine_capacity || 'N/A',
+      resolution: complaintData.resolution || '',
+    };
+
     const { data, error } = await supabase
       .from('complaints')
-      .update(complaintData)
+      .update(updateData)
       .eq('id', id)
       .select()
       .single();
 
     if (error) {
-      console.error('Supabase error:', error);
+      console.error('Failed to update complaint:', error);
       throw error;
     }
 

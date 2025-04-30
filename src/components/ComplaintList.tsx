@@ -1,51 +1,51 @@
-import React, { useState, memo, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Complaint } from '../types/complaint';
-import { Edit2, Trash2, ChevronDown, ChevronUp, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { ComplaintDetails } from './ComplaintDetails';
+import { Edit2, Trash2, ChevronDown, ChevronUp, AlertCircle, CheckCircle2, FileQuestion } from 'lucide-react';
 
 interface ComplaintListProps {
   complaints: Complaint[];
   onEdit: (complaint: Complaint) => void;
   onDelete: (id: string) => void;
+  onOpenDetails: (complaint: Complaint) => void;
 }
 
-export const ComplaintList = memo(function ComplaintList({ complaints, onEdit, onDelete }: ComplaintListProps) {
+export const ComplaintList = memo(function ComplaintList({ 
+  complaints, 
+  onEdit, 
+  onDelete,
+  onOpenDetails 
+}: ComplaintListProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedComplaint, setSelectedComplaint] = useState<Complaint | null>(null);
   
-  const toggleExpand = useCallback((id: string) => {
-    setExpandedId(expandedId === id ? null : id);
-  }, [expandedId]);
+  const handleViewDetails = useCallback((complaint: Complaint) => {
+    onOpenDetails(complaint);
+  }, [onOpenDetails]);
 
-  const handleOpenDetails = useCallback((complaint: Complaint) => {
-    setSelectedComplaint(complaint);
+  const toggleExpand = useCallback((id: string) => {
+    setExpandedId(prev => (prev === id ? null : id));
   }, []);
-  
-  const handleCloseDetails = useCallback(() => {
-    setSelectedComplaint(null);
-  }, []);
+
+  const [view, setView] = useState<'cards' | 'table'>('cards');
   
   if (complaints.length === 0) {
     return (
-      <div className="py-12 flex flex-col items-center justify-center glass-card">
-        <AlertCircle className="h-12 w-12 text-[#9CA3AF] mb-4" />
-        <h3 className="text-lg font-medium text-[#EAEAEA]">No complaints found</h3>
-        <p className="text-[#9CA3AF] mt-2">Try adjusting your search filters</p>
+      <div className="bg-[#1A1C20]/30 rounded-xl border border-[#2C2F36] p-8 text-center">
+        <div className="max-w-md mx-auto">
+          <FileQuestion className="h-16 w-16 text-[#3B4252] mx-auto mb-6" />
+          <h3 className="text-xl font-medium text-white mb-2">No complaints found</h3>
+          <p className="text-[#9CA3AF]">
+            There are no complaints matching your criteria. Try adjusting your filters or add a new complaint.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="overflow-hidden">
-      {/* Complaint Details Modal */}
-      <ComplaintDetails 
-        complaint={selectedComplaint} 
-        onClose={handleCloseDetails} 
-        onEdit={onEdit} 
-      />
-
       <div className="table-container smooth-scroll">
         <motion.div 
           initial={{ opacity: 0 }}
@@ -63,7 +63,7 @@ export const ComplaintList = memo(function ComplaintList({ complaints, onEdit, o
                 onToggleExpand={toggleExpand}
                 onEdit={onEdit}
                 onDelete={onDelete}
-                onOpenDetails={handleOpenDetails}
+                onOpenDetails={handleViewDetails}
                 index={index}
               />
             ))}
@@ -100,7 +100,7 @@ export const ComplaintList = memo(function ComplaintList({ complaints, onEdit, o
                   complaint={complaint}
                   onEdit={onEdit}
                   onDelete={onDelete}
-                  onOpenDetails={handleOpenDetails}
+                  onOpenDetails={handleViewDetails}
                   index={index}
                 />
               ))}

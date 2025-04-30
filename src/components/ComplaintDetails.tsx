@@ -26,7 +26,7 @@ export const ComplaintDetails = memo(function ComplaintDetails({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className="modal-overlay"
             onClick={onClose}
           />
           
@@ -36,7 +36,7 @@ export const ComplaintDetails = memo(function ComplaintDetails({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.98 }}
             transition={{ duration: 0.2, type: "spring", bounce: 0.1 }}
-            className="fixed inset-2 md:inset-10 glass-card z-50 overflow-auto hw-accelerated shadow-2xl max-h-[calc(100vh-4rem)]"
+            className="modal-content"
           >
             {/* Header with Title and Close button */}
             <div className="glass-card-header flex items-center justify-between sticky top-0 z-10">
@@ -56,7 +56,10 @@ export const ComplaintDetails = memo(function ComplaintDetails({
               </div>
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={() => onEdit(complaint)}
+                  onClick={() => {
+                    onClose();
+                    onEdit(complaint);
+                  }}
                   className="btn-primary text-sm py-1.5"
                 >
                   <Edit2 className="h-4 w-4 mr-1.5" />
@@ -72,11 +75,11 @@ export const ComplaintDetails = memo(function ComplaintDetails({
             </div>
             
             {/* Content */}
-            <div className="glass-card-body grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="glass-card-body grid grid-cols-1 md:grid-cols-2 gap-2 pt-1 pb-2">
               {/* Customer Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-[#9CA3AF]">Customer Information</h3>
-                <div className="space-y-3">
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-[#9CA3AF] mb-1">Customer Information</h3>
+                <div className="space-y-1.5">
                   <div>
                     <div className="text-sm text-[#9CA3AF]">Customer Name</div>
                     <div className="text-[#EAEAEA] font-medium">{complaint.customer_name}</div>
@@ -93,16 +96,24 @@ export const ComplaintDetails = memo(function ComplaintDetails({
               </div>
               
               {/* Machine Details */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium text-[#9CA3AF]">Machine Information</h3>
-                <div className="space-y-3">
+              <div className="space-y-2">
+                <h3 className="text-lg font-medium text-[#9CA3AF] mb-1">Machine Information</h3>
+                <div className="space-y-1.5">
                   <div>
                     <div className="text-sm text-[#9CA3AF]">Machine Type</div>
                     <div className="text-[#EAEAEA] font-medium">{complaint.machine_type}</div>
                   </div>
                   <div>
+                    <div className="text-sm text-[#9CA3AF]">Machine Capacity</div>
+                    <div className="text-[#EAEAEA]">{complaint.machine_capacity || 'N/A'}</div>
+                  </div>
+                  <div>
                     <div className="text-sm text-[#9CA3AF]">Machine Number</div>
                     <div className="text-[#EAEAEA]">{complaint.machine_number}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-[#9CA3AF]">Company Complaint Number</div>
+                    <div className="text-[#EAEAEA]">{complaint.company_complaint_number || 'N/A'}</div>
                   </div>
                   <div>
                     <div className="text-sm text-[#9CA3AF]">Complaint Number</div>
@@ -111,17 +122,17 @@ export const ComplaintDetails = memo(function ComplaintDetails({
                 </div>
               </div>
               
-              {/* Issue Details */}
-              <div className="space-y-4 md:col-span-2">
-                <h3 className="text-lg font-medium text-[#9CA3AF]">Complaint Details</h3>
-                <div className="space-y-3">
+              {/* Issue Details - Add negative top margin to reduce gap */}
+              <div className="space-y-2 md:col-span-2 -mt-2">
+                <h3 className="text-lg font-medium text-[#9CA3AF] mb-1">Complaint Details</h3>
+                <div className="space-y-1.5">
                   <div>
                     <div className="text-sm text-[#9CA3AF]">Date Reported</div>
                     <div className="text-[#EAEAEA]">{complaint.date}</div>
                   </div>
                   <div>
                     <div className="text-sm text-[#9CA3AF]">Fault Description</div>
-                    <div className="text-[#EAEAEA] p-3 bg-[#1F222A] rounded-lg">
+                    <div className="text-[#EAEAEA] p-2 bg-[#1F222A] rounded-lg">
                       {complaint.fault}
                     </div>
                   </div>
@@ -129,9 +140,9 @@ export const ComplaintDetails = memo(function ComplaintDetails({
               </div>
               
               {/* Service Details */}
-              <div className="space-y-4 md:col-span-2">
-                <h3 className="text-lg font-medium text-[#9CA3AF]">Service Information</h3>
-                <div className="space-y-3">
+              <div className="space-y-2 md:col-span-2">
+                <h3 className="text-lg font-medium text-[#9CA3AF] mb-1">Service Information</h3>
+                <div className="space-y-1.5">
                   <div>
                     <div className="text-sm text-[#9CA3AF]">Assigned Technician</div>
                     <div className="text-[#EAEAEA]">{complaint.technician_name || 'Not assigned'}</div>
@@ -143,7 +154,7 @@ export const ComplaintDetails = memo(function ComplaintDetails({
                   {complaint.resolution && (
                     <div>
                       <div className="text-sm text-[#9CA3AF]">Resolution Notes</div>
-                      <div className="text-[#EAEAEA] p-3 bg-[#1F222A] rounded-lg">
+                      <div className="text-[#EAEAEA] p-2 bg-[#1F222A] rounded-lg">
                         {complaint.resolution}
                       </div>
                     </div>

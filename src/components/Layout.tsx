@@ -5,13 +5,14 @@ import {
   FilePlus, 
   FileSearch, 
   ChevronLeft, 
-  ChevronRight
+  ChevronRight,
+  Edit
 } from 'lucide-react';
 
 interface LayoutProps {
   children: ReactNode;
-  currentView: 'dashboard' | 'new' | 'search';
-  onNavigate: (view: 'dashboard' | 'new' | 'search') => void;
+  currentView: 'dashboard' | 'new' | 'edit' | 'search';
+  onNavigate: (view: 'dashboard' | 'new' | 'edit' | 'search') => void;
 }
 
 export const Layout = memo(function Layout({ children, currentView, onNavigate }: LayoutProps) {
@@ -66,7 +67,7 @@ export const Layout = memo(function Layout({ children, currentView, onNavigate }
             icon={<FilePlus />} 
             label="New Complaint" 
             collapsed={collapsed}
-            active={currentView === 'new'}
+            active={currentView === 'new' || currentView === 'edit'}
             onClick={() => onNavigate('new')}
           />
           <NavItem 
@@ -105,9 +106,16 @@ interface NavItemProps {
 }
 
 const NavItem = memo(function NavItem({ icon, label, collapsed, active, onClick }: NavItemProps) {
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('NavItem clicked:', label);
+    onClick();
+  };
+
   return (
     <motion.button
-      onClick={onClick}
+      onClick={handleClick}
       className={`w-full flex items-center rounded-lg p-3 transition-all hw-accelerated ${
         active 
           ? 'bg-[#7C3AED] text-white' 
