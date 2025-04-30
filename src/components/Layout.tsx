@@ -56,27 +56,56 @@ export const Layout = memo(function Layout({ children, currentView, onNavigate }
         
         {/* Navigation Links */}
         <div className="flex-1 scroll-container smooth-scroll py-6 px-3 space-y-2">
-          <NavItem 
-            icon={<LayoutDashboard />} 
-            label="Dashboard" 
-            collapsed={collapsed}
-            active={currentView === 'dashboard'}
-            onClick={() => onNavigate('dashboard')}
-          />
-          <NavItem 
-            icon={<FilePlus />} 
-            label="New Complaint" 
-            collapsed={collapsed}
-            active={currentView === 'new' || currentView === 'edit'}
-            onClick={() => onNavigate('new')}
-          />
-          <NavItem 
-            icon={<FileSearch />} 
-            label="Search" 
-            collapsed={collapsed}
-            active={currentView === 'search'}
-            onClick={() => onNavigate('search')}
-          />
+          <button
+            onClick={() => {
+              console.log('Dashboard button clicked directly');
+              onNavigate('dashboard');
+            }}
+            className={`w-full flex items-center rounded-lg p-3 transition-all hw-accelerated ${
+              currentView === 'dashboard' 
+                ? 'bg-[#7C3AED] text-white' 
+                : 'text-[#9CA3AF] hover:bg-[#2A2E38]'
+            }`}
+          >
+            <span className="flex-shrink-0"><LayoutDashboard /></span>
+            {!collapsed && (
+              <span className="ml-3 font-medium">Dashboard</span>
+            )}
+          </button>
+          
+          <button
+            onClick={() => {
+              console.log('New Complaint button clicked directly');
+              onNavigate('new');
+            }}
+            className={`w-full flex items-center rounded-lg p-3 transition-all hw-accelerated ${
+              (currentView === 'new' || currentView === 'edit')
+                ? 'bg-[#7C3AED] text-white' 
+                : 'text-[#9CA3AF] hover:bg-[#2A2E38]'
+            }`}
+          >
+            <span className="flex-shrink-0"><FilePlus /></span>
+            {!collapsed && (
+              <span className="ml-3 font-medium">New Complaint</span>
+            )}
+          </button>
+          
+          <button
+            onClick={() => {
+              console.log('Search button clicked directly');
+              onNavigate('search');
+            }}
+            className={`w-full flex items-center rounded-lg p-3 transition-all hw-accelerated ${
+              currentView === 'search'
+                ? 'bg-[#7C3AED] text-white' 
+                : 'text-[#9CA3AF] hover:bg-[#2A2E38]'
+            }`}
+          >
+            <span className="flex-shrink-0"><FileSearch /></span>
+            {!collapsed && (
+              <span className="ml-3 font-medium">Search</span>
+            )}
+          </button>
         </div>
       </motion.div>
       
@@ -110,7 +139,12 @@ const NavItem = memo(function NavItem({ icon, label, collapsed, active, onClick 
     e.preventDefault();
     e.stopPropagation();
     console.log('NavItem clicked:', label);
-    onClick();
+    
+    // Add delay to ensure event completes
+    setTimeout(() => {
+      console.log('Executing onClick for:', label);
+      onClick();
+    }, 0);
   };
 
   return (
